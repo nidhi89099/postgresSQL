@@ -1,0 +1,6 @@
+SELECT * FROM customers;
+*********************
+SELECT * FROM customers;
+SELECT * FROM customers WHERE username='alicethewonderland';
+**********************************
+SELECT username FROM customers WHERE email LIKE '%c@gmail.com';
