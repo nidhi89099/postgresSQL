@@ -1,0 +1,12 @@
+// Delete Database Records
+
+DELETE  FROM customers
+WHERE customerid = 1
+RETURNING *;
+*************************
+DELETE FROM customers
+WHERE username <> 'adwill'
+RETURNING *;
+*************************
+DELETE FROM customers
+RETURNING*;
