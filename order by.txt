@@ -1,0 +1,16 @@
+// Sorting Database Records
+
+SELECT firstname || ' ' ||lastname fullname,email, LENGTH(password) passwordlength
+FROM CUSTOMERS
+WHERE LENGTH(password)>5 
+ORDER BY passwordlength;
+
+********************************
+Output:-
+
+fullname   |      email       | passwordlength 
+-------------+------------------+----------------
+ Adam Will   | adwill@gmail.com |              5
+ Pablo Gonta | pgonta@gmail.com |              5
+ Nidhi Gupta | abc@gmail.com    |              7
+(3 rows)
