@@ -1,0 +1,76 @@
+//Inner Joins
+*****************************************
+SELECT o.order_id,o.purchasetotal,c.email
+FROM orders o
+INNER JOIN customers c ON
+o.customer_id = c.customerid;
+**************************************************
+Result:-
+
+ order_id | purchasetotal |        email         
+----------+---------------+----------------------
+        1 |         77.96 | kdiamond@myemail.com
+        2 |        500.13 | kdiamond@myemail.com
+        3 |         24.14 | taytay89@myemail.com
+        4 |        123.45 | taytay89@myemail.com
+        5 |         90.90 | kdiamond@myemail.com
+        6 |         72.83 | taytay89@myemail.com
+        7 |         90.90 | kdiamond@myemail.com
+(7 rows)
+___________________________________________________________
+// Outer Joins
+************************************
+CREATE TABLE programs (
+  program_id SERIAL PRIMARY KEY,
+  program_name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE students (
+  student_id SERIAL PRIMARY KEY,
+  student_name VARCHAR(255) NOT NULL,
+  program_id INT REFERENCES programs(program_id)
+);
+
+INSERT INTO programs (program_name)
+VALUES ('Linux'), ('PostgreSQL'), ('Kubernetes'), ('Leadership');
+
+INSERT INTO students (student_name, program_id)
+VALUES ('Alice', 1), ('Abdul', 1), ('Yvette', 2), ('Hyeon', NULL), ('Pedro', 4);
+***********************************************************************************
+SELECT p.program_name,
+COUNT(s.student_id) AS student_count
+FROM programs p
+LEFT OUTER JOIN  students s ON
+p.program_id = s.program_id
+GROUP BY p.program_name;
+ program_name | student_count 
+--------------+---------------
+ Kubernetes   |             0
+ Leadership   |             1
+ PostgreSQL   |             1
+ Linux        |             2
+(4 rows)
+____________________________________________________________________
+Inner Joins VS Outer Joins
+
+Inner Join:
+1) An inner join returns only the matching rows from both tables based on the specified join condition.
+2)If there is no match between the tables, the rows from both tables are excluded from the result set.
+SELECT columns
+FROM table1
+INNER JOIN table2 ON join_condition;
+
+Outer Join:
+1)An outer join returns the matching rows as well as any unmatched rows from one or both tables.
+2)There are three types of outer joins: left outer join, right outer join, and full outer join.
+3)A left outer join returns all the rows from the left table and the matching rows from the right table. If there is no match, NULL values are included for the columns of the right table.
+4)A right outer join is the opposite of a left outer join, returning all the rows from the right table and the matching rows from the left table.
+5)A full outer join returns all the rows from both tables, including the matching and non-matching rows. If there is no match, NULL values are included for the columns of the non-matching table.
+
+SELECT columns
+FROM table1
+LEFT OUTER JOIN table2 ON join_condition;
+___________________________________________________________________________
+PostgreSQL join is used to combine columns from one (self-join) or more tables based on the values of the common columns between related tables. The common columns are typically the primary key columns of the first table and foreign key columns of the second table.
+
+PostgreSQL supports inner join, left join, right join, full outer join, cross join, natural join, and a special kind of join called self-join.
