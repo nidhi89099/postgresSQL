@@ -1,0 +1,23 @@
+//sorting databasetables
+
+Concatenation -> is the process of combining two or more strings, values, or expressions into a single string. 
+******************************************************************************************
+SELECT firstname || ' ' ||lastname fullname,email, LENGTH(password) passwordlength;
+FROM customers
+ORDER BY passwordlength;
+*********************************************************************************
+
+SELECT firstname || ' ' ||lastname fullname,email, LENGTH(password) passwordlength
+FROM CUSTOMERS
+WHERE LENGTH(password)>5 
+ORDER BY passwordlength;
+_____________________________________________________________________________________________
+Result:-
+
+  fullname   |      email       | passwordlength 
+-------------+------------------+----------------
+ Adam Will   | adwill@gmail.com |              5
+ Pablo Gonta | pgonta@gmail.com |              5
+ Nidhi Gupta | abc@gmail.com    |              7
+(3 rows)
+_________________________________________________________________________________________________
