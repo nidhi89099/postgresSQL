@@ -1,0 +1,23 @@
+// Creating Temproary Table
+
+Its a short-lived table , available only to current session and dropped itself after the sesion is end.
+Its used to store the temporary and intermediate data for the current session only
+'Temproary' keyword used to create the table
+*********************************************
+ CREATE TEMPORARY TABLE temp_customer_purchases AS
+ SELECT c.customerid, c.email,
+SUM(o.purchase_total) AS purchases
+ FROM customers c
+INNER JOIN orders o ON c.customerid = o.customer_id
+GROUP BY c.customerid, c.email;
+SELECT 3
+********************************************
+Output:-
+
+linkedin=> SELECT * FROM temp_customer_purchases;
+ customerid |      email       | purchases 
+------------+------------------+-----------
+          2 | adwill@gmail.com |    668.99
+          3 | pgonta@gmail.com |    327.52
+          1 | abc@gmail.com    |    259.70
+(3 rows)
