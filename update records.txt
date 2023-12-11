@@ -1,0 +1,24 @@
+Add a new column phone_no and add phone numbers
+********************************************
+ALTER TABLE customers ADD COLUMN phone_number VARCHAR(20);
+ALTER TABLE
+**********************************************************
+UPDATE customers
+SET phone_number = CASE
+     WHEN customers_id = 3 THEN '123-456-7890'
+    WHEN customers_id = 1 THEN '(987)654-3210'
+    WHEN customers_id = 2 THEN '9876543210'
+END;
+
+insert into customers(phone_number) values('123-456-7890')
+
+**********************************
+UPDATE CUSTOMERS
+SET phone_number=
+REGEXP_REPLACE(phone_number,'[^0-9]','','g')
+WHERE phone_number ~ '[^0-9]';
+**************************************
+UPDATE CUSTOMERS
+SET phone_number=
+REGEXP_REPLACE(phone_number,'([0-9]{3})([0-9]{3})([0-9]{4})','\1-,\2-,\3')
+WHERE phone_number ~ '^[0-9]{10}$';
