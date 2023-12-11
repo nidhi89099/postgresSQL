@@ -1,0 +1,402 @@
+create table customers (customerid serial PRIMARY KEY, firstname VARCHAR(100), lastname VARCHAR(100) NOT NULL, username VARCHAR(100) NOT NULL, password VARCHAR(50) NOT NULL, email VARCHAR(50)  unique NOT NULL, created_on TIMESTAMPTZ NOT NULL);
+____________________________________________________________________________________________________
+//insert records
+*************************************************************************
+INSERT INTO customers (firstname,lastname,username,password,email,created_on)
+VALUES('Nidhi','Gupta','Npta','8945@56','abc@gmail.com',CURRENT_TIMESTAMP),
+('Adam','Will','adwill','kl?45','adwill@gmail.com',CURRENT_TIMESTAMP),
+('Pablo','Gonta','pgonta','89?45','pgonta@gmail.com',CURRENT_TIMESTAMP);
+**************************************************************************
+SELECT * FROM customers;
+UPDATE customers
+SET username= 'alicethewonderland'
+WHERE email= 'abc@gmail.com';
+
+SELECT * FROM customers;
+SELECT * FROM customers WHERE username='alicethewonderland';
+____________________________________________________________________
+
+//Locating database result
+linkedin=> SELECT username FROM customers WHERE email LIKE '%c@gmail.com';
+      username      
+--------------------
+ alicethewonderland
+(1 row)
+_________________________________________________________________________________________
+//sorting databasetables
+Concatenation -> is the process of combining two or more strings, values, or expressions into a single string. 
+******************************************************************************************
+SELECT firstname || ' ' ||lastname fullname,email, LENGTH(password) passwordlength;
+ FROM customers
+ORDER BY passwordlength;
+*********************************************************************************
+Result:-
+
+  fullname   |      email       | passwordlength 
+-------------+------------------+----------------
+ Adam Will   | adwill@gmail.com |              5
+ Pablo Gonta | pgonta@gmail.com |              5
+ Nidhi Gupta | abc@gmail.com    |              7
+(3 rows)
+*******************************************************************************************
+SELECT firstname || ' ' ||lastname fullname,email, LENGTH(password) passwordlength
+FROM CUSTOMERS
+WHERE LENGTH(password)>5 
+ORDER BY passwordlength;
+_________________________________________________________________________________________________
+
+// Deleting orders
+DELETE  FROM customers
+WHERE customerid = 1
+RETURNING *;
+*************************
+DELETE FROM customers
+WHERE username <> 'adwill'
+RETURNING *;
+*************************
+DELETE FROM customers
+RETURNING*;
+
+____________________________________________________________________________________________________
+
+*******https://www.geeksforgeeks.org/difference-between-primary-key-and-foreign-key/
+//2.1 Creating a table using a Foreign Key
+**************************************************************************************************************
+CREATE TABLE orders(order_id SERIAL PRIMARY KEY,purchase_Total NUMERIC,timestamp TIMESTAMPTZ,customer_id INT
+REFERENCES customers(customerid)
+ON DELETE CASCADE);
+***************************************************************************
+ DELETE FROM customers 
+WHERE customerid = 4
+Returning *;
+_____________________________________________________________________________
+//Identifying transaction total per customer
+
+ SELECT customer_id,
+ MAX(purchase_total)
+ AS top_order_amt
+FROM orders
+GROUP BY customer_id
+ORDER BY top_order_amt;
+ customer_id | top_order_amt 
+-------------+---------------
+           5 |        123.45
+           4 |        500.13
+
+_________________________________________________________
+
+//Using sbqueries to insert records
+*****************************************************************
+INSERT INTO orders (purchasetotal, timestamp, customer_id) 
+ VALUES('90.90','2023-12-08 14:04:03.018263+00',
+(SELECT customerid  FROM customers WHERE email='kdiamond@myemail.com'))
+RETURNING *;
+***********************************************************************
+Result:-
+
+ order_id | purchasetotal |           timestamp           | customer_id 
+----------+---------------+-------------------------------+-------------
+        7 |         90.90 | 2023-12-08 14:04:03.018263+00 |           4
+(1 row)
+
+*********************************
+// Count duplicate Records
+**IN operator within a function to perform comparisons against a list of values.
+
+**************
+//Inner Joins
+*****************************************
+SELECT o.order_id,o.purchasetotal,c.email
+FROM orders o
+INNER JOIN customers c ON
+o.customer_id = c.customerid;
+**************************************************
+Result:-
+
+ order_id | purchasetotal |        email         
+----------+---------------+----------------------
+        1 |         77.96 | kdiamond@myemail.com
+        2 |        500.13 | kdiamond@myemail.com
+        3 |         24.14 | taytay89@myemail.com
+        4 |        123.45 | taytay89@myemail.com
+        5 |         90.90 | kdiamond@myemail.com
+        6 |         72.83 | taytay89@myemail.com
+        7 |         90.90 | kdiamond@myemail.com
+(7 rows)
+___________________________________________________________________
+
+// Outer Joins
+
+SELECT p.program_name,
+COUNT(s.student_id) AS student_count
+FROM programs p
+LEFT OUTER JOIN  students s ON
+p.program_id = s.program_id
+GROUP BY p.program_name;
+************************************************
+ program_name | student_count 
+--------------+---------------
+ Kubernetes   |             0
+ Leadership   |             1
+ PostgreSQL   |             1
+ Linux        |             2
+(4 rows)
+
+
+
+
+********************************************
+CREATE TABLE programs (
+  program_id SERIAL PRIMARY KEY,
+  program_name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE students (
+  student_id SERIAL PRIMARY KEY,
+  student_name VARCHAR(255) NOT NULL,
+  program_id INT REFERENCES programs(program_id)
+);
+
+INSERT INTO programs (program_name)
+VALUES ('Linux'), ('PostgreSQL'), ('Kubernetes'), ('Leadership');
+
+INSERT INTO students (student_name, program_id)
+VALUES ('Alice', 1), ('Abdul', 1), ('Yvette', 2), ('Hyeon', NULL), ('Pedro', 4);
+***********************************************************************************
+SELECT p.program_name,
+COUNT(s.student_id) AS student_count
+FROM programs p
+LEFT OUTER JOIN  students s ON
+p.program_id = s.program_id
+GROUP BY p.program_name;
+ program_name | student_count 
+--------------+---------------
+ Kubernetes   |             0
+ Leadership   |             1
+ PostgreSQL   |             1
+ Linux        |             2
+(4 rows)
+***********************************
+Inner Joins VS Outer Joins
+
+Inner Join:
+1) An inner join returns only the matching rows from both tables based on the specified join condition.
+2)If there is no match between the tables, the rows from both tables are excluded from the result set.
+SELECT columns
+FROM table1
+INNER JOIN table2 ON join_condition;
+
+Outer Join:
+1)An outer join returns the matching rows as well as any unmatched rows from one or both tables.
+2)There are three types of outer joins: left outer join, right outer join, and full outer join.
+3)A left outer join returns all the rows from the left table and the matching rows from the right table. If there is no match, NULL values are included for the columns of the right table.
+4)A right outer join is the opposite of a left outer join, returning all the rows from the right table and the matching rows from the left table.
+5)A full outer join returns all the rows from both tables, including the matching and non-matching rows. If there is no match, NULL values are included for the columns of the non-matching table.
+
+SELECT columns
+FROM table1
+LEFT OUTER JOIN table2 ON join_condition;
+_____________________________________________________________
+
+// Creating Temproary Table
+
+Its a short-lived table , available only to current session and dropped itself after the sesion is end.
+Its used to store the temporary and intermediate data for the current session only
+'Temproary' keyword used to create the table
+*********************************************
+ CREATE TEMPORARY TABLE temp_customer_purchases AS
+ SELECT c.customerid, c.email,
+SUM(o.purchase_total) AS purchases
+ FROM customers c
+INNER JOIN orders o ON c.customerid = o.customer_id
+GROUP BY c.customerid, c.email;
+SELECT 3
+********************************************
+Output:-
+
+linkedin=> SELECT * FROM temp_customer_purchases;
+ customerid |      email       | purchases 
+------------+------------------+-----------
+          2 | adwill@gmail.com |    668.99
+          3 | pgonta@gmail.com |    327.52
+          1 | abc@gmail.com    |    259.70
+(3 rows)
+__________________________________________________
+
+Section-3
+Add a new column phone_no and add phone numbers
+********************************************
+ALTER TABLE customers ADD COLUMN phone_number VARCHAR(20);
+ALTER TABLE
+**********************************************************
+UPDATE customers
+SET phone_number = CASE
+     WHEN customers_id = 3 THEN '123-456-7890'
+    WHEN customers_id = 1 THEN '(987)654-3210'
+    WHEN customers_id = 2 THEN '9876543210'
+END;
+
+insert into customers(phone_number) values('123-456-7890')
+
+**********************************
+UPDATE CUSTOMERS
+SET phone_number=
+REGEXP_REPLACE(phone_number,'[^0-9]','','g')
+WHERE phone_number ~ '[^0-9]';
+**************************************
+UPDATE CUSTOMERS
+SET phone_number=
+REGEXP_REPLACE(phone_number,'([0-9]{3})([0-9]{3})([0-9]{4})','\1-,\2-,\3')
+WHERE phone_number ~ '^[0-9]{10}$';
+____________________________________________________________________________
+
+//Filtering Sensitive data
+
+UPPER function->UPPER function is used to convert a string to uppercase. It takes a string expression as input and returns the uppercase version of the string.SELECT UPPER('hello, world');
+SUBSTRING ->It allows you to retrieve a portion of a string based on specified starting position and length or based on a regular expression pattern. SUBSTRING(string_expression FROM start_position [FOR length])
+CONCAT ->CONCAT function is used to concatenate multiple strings together. It allows you to join two or more strings into a single string.CONCAT(string1, string2, ...)
+SELECT CONCAT('Hello', ', ', 'world!');
+
+SELECT CONCAT (firstname,' ',UPPER(SUBSTRING(lastname,1,1)), '.') AS fullname, email, (SELECT CONCAT('***-***-',RIGHT(phone_number,4)) AS masked_phone_number) FROM CUSTOMERS;
+
+SELECT CONCAT(firstname, ' ', UPPER(SUBSTRING(lastname,1,1)), '.') AS fullname, email  FROM CUSTOMERS;
+__________________________________________________________________________________________________________
+
+//Order Status
+add orders table and add status column and change the order status
+******************************************************************
+ALTER TABLE orders
+ADD COLUMN status VARCHAR(50);
+
+UPDATE Orders
+SET status = CASE
+    WHEN order_id = 3 THEN 'Delivered'
+    WHEN order_id = 4 THEN 'Preparing for Shipment'
+    WHEN order_id = 6 THEN 'On Hold'
+    WHEN order_id = 7 THEN 'Cancelled'
+    WHEN order_id = 8 THEN 'Payment Error'
+    WHEN order_id = 9 THEN 'Delivered'
+    WHEN order_id = 10 THEN 'Preparing for Shipment'
+    ELSE 'Unknown'
+    END;
+******************************************************************
+UPDATE orders
+SET status = CASE
+WHEN order_id<7 OR timestamp<'2023-12-10 00:00:00+0'
+THEN 'SHIPPED'
+ELSE 'Preparing for Shippment'
+END;
+_______________________________________
+// Data cleanup
+
+INITCAP-> INITCAP function is used to convert the first letter of each word in a string to uppercase, while converting the remaining letters to lowercase
+UPDATE ORDERS
+linkedin-> SET 
+linkedin-> STREET= INITCAP(TRIM(STREET)),
+linkedin-> CITY = INITCAP(TRIM(CITY)),
+linkedin-> STATE = UPPER(TRIM(STATE));
+
+UPDATE orders
+linkedin-> SET
+linkedin-> zip_code = SUBSTRING(REGEXP_REPLACE(TRIM(zip_code),'[^0-9]','','g'),1,5);
+_________________________________________________
+
+//Generating fictious data
+****************************************************
+CREATE TABLE bookmarks(
+	id SERIAL PRIMARY KEY,
+	url VARCHAR(255) NOT NULL,
+	name VARCHAR(255) NOT NULL,
+	description VARCHAR(255)
+);
+
+INSERT INTO bookmarks (url, name, description)
+VALUES('https://www.postgresql.org','Official PostgreSQL Website','The primary place to find PostgreSQL Global Development Group recommended content.'),
+('https://www.postgresql.org','Official PostgreSQL Website','The primary place to find PostgreSQL Global Development Group recommended content.'),
+('https.//www.ask.com','Ask Jeeves','Answers you want. Content for days. What more could you Ask for?'),
+('https://www.postgis.net','PostGIS','A spatial database extender for the PostgreSQL object relational database.'),
+('https://www.reddit.com','Reddit','A network of communities where people can dive into their interests, hobbies, and passions.');
+
+
+**********************************************************************
+SELECT 'https://www.postgresql.org' || generate_series AS url,
+'Bookmark' || generate_series AS name,
+'Description' || generate_series as description FROM generate_series(1,10) AS generate_series;
+***************************************************************
+
+             url              |    name    |  description  
+------------------------------+------------+---------------
+ https://www.postgresql.org1  | Bookmark1  | Description1
+ https://www.postgresql.org2  | Bookmark2  | Description2
+ https://www.postgresql.org3  | Bookmark3  | Description3
+ https://www.postgresql.org4  | Bookmark4  | Description4
+ https://www.postgresql.org5  | Bookmark5  | Description5
+ https://www.postgresql.org6  | Bookmark6  | Description6
+ https://www.postgresql.org7  | Bookmark7  | Description7
+ https://www.postgresql.org8  | Bookmark8  | Description8
+ https://www.postgresql.org9  | Bookmark9  | Description9
+ https://www.postgresql.org10 | Bookmark10 | Description10
+(10 rows)
+________________________________________________________________________
+
+//Encrypting password
+
+MD5 is a built-in function in Postgres that takes a string as an argument and converts it into a 32 characters text string. It retrieves the resultant value in the hexadecimal. It is commonly used to fulfill security purposes. MD5 accepts only string values; passing an integer will result in an error.
+The PostgreSQL MD5() function calculates the MD5 hash of a string and returns the result in hexadecimal.
+Syntax:-MD5(string)
+******************************************************************************************
+CREATE TABLE users (
+    user_id SERIAL PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL
+);
+
+INSERT INTO users (username, password)
+VALUES
+    ('JohnDoe', 'P@ssw0rd123'),
+    ('KimLee', 'SecurePwd!'),
+    ('RunningBear', 'Secret123'),
+    ('AishaMalik', 'StrongPassord!23'),
+    ('AliceSmith', 'Passw0rdSafe'),
+    ('KaiNguyen', 'P@55w0rd!'),
+    ('LiamJones', 'SecurePass123'),
+    ('MalinaPritchard', 'P@ssw0rd!23'),
+    ('AnikaPatel', 'S3curePwd!'),
+    ('TaneWilliams', 'Secret!23'),
+    ('SitiRahman', 'StrongPassword!');
+**************************************************************************
+ALTER TABLE users
+ADD COLUMN password_hash VARCHAR(255),
+ADD COLUMN password_salt VARCHAR(255);
+******************************************************************************
+ UPDATE users
+SET password_salt = substr(md5(random()::text),1,16);
+********************************************************************
+UPDATE users
+SET password_hash = md5(concat(password_salt,password))
+WHERE password_hash IS NULL;
+***********************************
+SELECT user_id,password_salt,password_hash,password from users;
+Result:-
+user_id |  password_salt   |          password_hash           |     password     
+---------+------------------+----------------------------------+------------------
+       1 | 068ed2e40abfb677 | 3dd2007f72d80d4a2d59d083d32c4174 | P@ssw0rd123
+       2 | d5785a72623c2097 | c10caf646b42ae449d171057215307f1 | SecurePwd!
+       3 | ad327856011927d1 | 71d288a9f1d762d4e57fef82cb29db23 | Secret123
+       4 | 64dd1f6d921d48f7 | fc3da8c386001069b2918b5c0bcdea03 | StrongPassord!23
+       5 | 621281541ccec89d | 674d09996ca940d7a89a448fc37d4a23 | Passw0rdSafe
+       6 | 77c5a605d9af928c | 62ed98272539ae2152920a35b41f9f1e | P@55w0rd!
+       7 | fa49b462dcdd4704 | 55f9953c4466ce04ce5e22005960521d | SecurePass123
+       8 | c47aab0d852f41a9 | 88473fb1aad3e6a5f57abec1e05d7fe3 | P@ssw0rd!23
+       9 | c55145d894a662c7 | 2880a08340bf60679b8e12701a926fd1 | S3curePwd!
+      10 | d5437118550d83b0 | dea1bcea067e9329a4826e915cdb3604 | Secret!23
+      11 | 9f97e2e472642273 | 47407a59066432e99ad6bbd613ec1ffc | StrongPassword!
+      12 | 4827bf1f20183a02 | 644d53fbdd8784b263d897c979a8d927 | P@ssw0rd123
+:
+
+
+
+
+
+
+
