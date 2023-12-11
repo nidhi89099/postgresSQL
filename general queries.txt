@@ -1,0 +1,64 @@
+//Identifying transaction total per customer
+
+SELECT customer_id,
+MAX(purchase_total)
+AS top_order_amt
+FROM orders
+GROUP BY customer_id
+ORDER BY top_order_amt;
+______________________________
+Result:-
+ customer_id | top_order_amt 
+-------------+---------------
+           5 |        123.45
+           4 |        500.13
+_________________________________________________________
+//Generating fictious data
+****************************************************
+CREATE TABLE bookmarks(
+	id SERIAL PRIMARY KEY,
+	url VARCHAR(255) NOT NULL,
+	name VARCHAR(255) NOT NULL,
+	description VARCHAR(255)
+);
+
+INSERT INTO bookmarks (url, name, description)
+VALUES('https://www.postgresql.org','Official PostgreSQL Website','The primary place to find PostgreSQL Global Development Group recommended content.'),
+('https://www.postgresql.org','Official PostgreSQL Website','The primary place to find PostgreSQL Global Development Group recommended content.'),
+('https.//www.ask.com','Ask Jeeves','Answers you want. Content for days. What more could you Ask for?'),
+('https://www.postgis.net','PostGIS','A spatial database extender for the PostgreSQL object relational database.'),
+('https://www.reddit.com','Reddit','A network of communities where people can dive into their interests, hobbies, and passions.');
+
+
+**********************************************************************
+SELECT 'https://www.postgresql.org' || generate_series AS url,
+'Bookmark' || generate_series AS name,
+'Description' || generate_series as description FROM generate_series(1,10) AS generate_series;
+***************************************************************
+
+             url              |    name    |  description  
+------------------------------+------------+---------------
+ https://www.postgresql.org1  | Bookmark1  | Description1
+ https://www.postgresql.org2  | Bookmark2  | Description2
+ https://www.postgresql.org3  | Bookmark3  | Description3
+ https://www.postgresql.org4  | Bookmark4  | Description4
+ https://www.postgresql.org5  | Bookmark5  | Description5
+ https://www.postgresql.org6  | Bookmark6  | Description6
+ https://www.postgresql.org7  | Bookmark7  | Description7
+ https://www.postgresql.org8  | Bookmark8  | Description8
+ https://www.postgresql.org9  | Bookmark9  | Description9
+ https://www.postgresql.org10 | Bookmark10 | Description10
+(10 rows)
+_________________________________________________________________________
+// Data cleanup
+
+INITCAP-> INITCAP function is used to convert the first letter of each word in a string to uppercase, while converting the remaining letters to lowercase
+UPDATE ORDERS
+linkedin-> SET 
+linkedin-> STREET= INITCAP(TRIM(STREET)),
+linkedin-> CITY = INITCAP(TRIM(CITY)),
+linkedin-> STATE = UPPER(TRIM(STATE));
+
+UPDATE orders
+linkedin-> SET
+linkedin-> zip_code = SUBSTRING(REGEXP_REPLACE(TRIM(zip_code),'[^0-9]','','g'),1,5);
